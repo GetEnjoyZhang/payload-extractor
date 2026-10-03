@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 液态玻璃 · 浅色 -->
+    <color name="bg">#EEF3FF</color>
+    <color name="on_bg">#101527</color>
+    <color name="hint">#5B6478</color>
+    <color name="accent">#2F6BFF</color>
+    <color name="on_accent">#FFFFFF</color>
+
+    <!-- 玻璃面 -->
+    <color name="card_fill">#96FFFFFF</color>
+    <color name="card_stroke_start">#C8FFFFFF</color>
+    <color name="card_stroke_end">#1AFFFFFF</color>
+    <color name="input_fill">#7AFFFFFF</color>
+
+    <!-- 渐变底（状态栏外由 windowBackground 透出） -->
+    <color name="g1">#DCE9FF</color>
+    <color name="g2">#EFD9F6</color>
+    <color name="g3">#D8F3EF</color>
+
+    <color name="btn_g1">#3B82F6</color>
+    <color name="btn_g2">#2F5BFF</color>
+    <color name="track">#66FFFFFF</color>
+    <color name="prog_g1">#3B82F6</color>
+    <color name="prog_g2">#22D3EE</color>
+    <color name="pill_fill">#8CF0F6FF</color>
+    <color name="pill_stroke">#662F6BFF</color>
+
+    <color name="success">#16A34A</color>
+    <color name="fail">#E11D48</color>
+    <color name="icon_blue">#5B9BFF</color>
+    <color name="icon_green">#34D399</color>
+    <color name="icon_gray">#94A3B8</color>
+    <color name="icon_violet">#A78BFA</color>
+</resources>

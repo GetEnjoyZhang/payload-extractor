@@ -174,9 +174,9 @@ fun main(args: Array<String>) {
         val boot = mf.partitions[0]
         check(boot.size == 40960L) { "boot 大小 ${boot.size}" }
         val out = java.io.File("build_t1_boot.img")
-        Extractor.extractPartition(z, e, mf, boot, out) { ph, c, t ->
-            p("    $ph $c/$t")
-        }
+        val sink1 = com.zcode.payloadextractor.core.OutputImage.of(out)
+        Extractor.extractPartition(z, e, mf, boot, sink1, { ph, c, t -> p("    $ph $c/$t") })
+        sink1.close()
         verifyBoot(out.readBytes())
         out.delete()
     }
@@ -190,9 +190,9 @@ fun main(args: Array<String>) {
         check(!e.randomAccess) { "deflate 条目应走流式路径" }
         val mf = PayloadReader.parse { off, len -> z.readEntryBytes(e, off, len) }
         val out = java.io.File("build_t2_boot.img")
-        Extractor.extractPartition(z, e, mf, mf.partitions[0], out) { ph, c, t ->
-            p("    $ph $c/$t")
-        }
+        val sink2 = com.zcode.payloadextractor.core.OutputImage.of(out)
+        Extractor.extractPartition(z, e, mf, mf.partitions[0], sink2, { ph, c, t -> p("    $ph $c/$t") })
+        sink2.close()
         verifyBoot(out.readBytes())
         out.delete()
     }
@@ -207,7 +207,9 @@ fun main(args: Array<String>) {
             PayloadReader.Op().apply { type = 9; dst.add(longArrayOf(10, 2)) }
         )
         try {
-            Extractor.extractPartition(z, e, mf, mf.partitions[0], java.io.File("build_t3.img")) { _, _, _ -> }
+            val sink3 = com.zcode.payloadextractor.core.OutputImage.of(java.io.File("build_t3.img"))
+            Extractor.extractPartition(z, e, mf, mf.partitions[0], sink3, { _, _, _ -> })
+            sink3.close()
             throw AssertionError("应当抛出 UnsupportedPayloadException")
         } catch (ex: Extractor.UnsupportedPayloadException) {
             p("  ✓ 正确拒绝: ${ex.message}")
@@ -222,7 +224,9 @@ fun main(args: Array<String>) {
         val z = RemoteZip(url); z.open()
         val e = z.listEntries().first { it.name == "boot.img" }
         val out = java.io.File("build_t4_boot.img")
-        Extractor.extractEntry(z, e, out) { ph, c, t -> p("    $ph $c/$t") }
+        val sink4 = com.zcode.payloadextractor.core.OutputImage.of(out)
+        Extractor.extractEntry(z, e, sink4, { ph, c, t -> p("    $ph $c/$t") })
+        sink4.close()
         check(out.length() == fake.size.toLong()) { "大小不符" }
         check(out.readBytes().sliceArray(0 until 1000).contentEquals(fake.sliceArray(0 until 1000))) { "内容不符" }
         out.delete()
@@ -236,7 +240,9 @@ fun main(args: Array<String>) {
         p("  总大小: ${z.totalSize / 1048576} MB, 条目数: ${z.listEntries().size}")
         val boot = z.listEntries().first { it.name == "boot.img" }
         val out = java.io.File("build_t5_boot.img")
-        Extractor.extractEntry(z, boot, out) { ph, c, t -> print("\r    $ph $c/$t") }
+        val sink5 = com.zcode.payloadextractor.core.OutputImage.of(out)
+        Extractor.extractEntry(z, boot, sink5, { ph, c, t -> print("\r    $ph $c/$t") })
+        sink5.close()
         println()
         val head = out.readBytes().sliceArray(0 until 8).decodeToString()
         check(head == "ANDROID!") { "boot.img 魔数错误: $head" }

@@ -19,7 +19,10 @@ import java.util.zip.InflaterInputStream
  */
 class RemoteZip(val url: String) {
 
-    class Entry(val name: String, val method: Int, val csize: Long, val usize: Long, val lho: Long) {
+    class Entry(
+        val name: String, val method: Int, val csize: Long,
+        val usize: Long, val lho: Long, val crc: Long = 0
+    ) {
         val randomAccess: Boolean get() = method == 0
         override fun toString() = name
     }
@@ -57,12 +60,13 @@ class RemoteZip(val url: String) {
         return c.inputStream
     }
 
-    fun readRange(start: Long, endIncl: Long): ByteArray {
+    fun readRange(start: Long, endIncl: Long, checkCancel: () -> Unit = {}): ByteArray {
         streamRange(start, endIncl).use { ins ->
             val expect = endIncl - start + 1
             val out = ByteArrayOutputStream(expect.toInt().coerceAtLeast(64))
             val buf = ByteArray(BUF)
             while (true) {
+                checkCancel()
                 val n = ins.read(buf)
                 if (n < 0) break
                 out.write(buf, 0, n)
@@ -137,7 +141,7 @@ class RemoteZip(val url: String) {
             b.short // flags
             val method = b.short.toInt() and 0xffff
             b.short; b.short // time, date
-            b.int             // crc
+            val crc = b.int.toLong() and 0xffffffffL
             var csize = b.int.toLong() and 0xffffffffL
             var usize = b.int.toLong() and 0xffffffffL
             val nlen = b.short.toInt() and 0xffff
@@ -173,7 +177,7 @@ class RemoteZip(val url: String) {
                     q += 4 + sz
                 }
             }
-            entries.add(Entry(name, method, csize, usize, lho))
+            entries.add(Entry(name, method, csize, usize, lho, crc))
             p += 46 + nlen + elen + clen
         }
         if (entries.isEmpty()) throw IOException("ZIP 目录中没有条目")
@@ -190,10 +194,10 @@ class RemoteZip(val url: String) {
     }
 
     /** 读取条目内部 [off, off+len) 的一段数据（解压后的）。payload.bin manifest 用。 */
-    fun readEntryBytes(e: Entry, off: Long, len: Int): ByteArray {
+    fun readEntryBytes(e: Entry, off: Long, len: Int, checkCancel: () -> Unit = {}): ByteArray {
         val dOff = dataOffset(e)
         return when (e.method) {
-            0 -> readRange(dOff + off, dOff + off + len - 1)
+            0 -> readRange(dOff + off, dOff + off + len - 1, checkCancel)
             8 -> {
                 var skipped = 0L
                 val out = ByteArrayOutputStream(len)
@@ -201,6 +205,7 @@ class RemoteZip(val url: String) {
                     InflaterInputStream(raw, Inflater(true), BUF).use { ins ->
                         val buf = ByteArray(BUF)
                         while (out.size() < len) {
+                            checkCancel()
                             val want = if (skipped < off)
                                 ((off - skipped).coerceAtMost(BUF.toLong())).toInt()
                             else (len - out.size()).coerceAtMost(BUF)
@@ -220,11 +225,12 @@ class RemoteZip(val url: String) {
     fun <T> streamEntry(
         e: Entry,
         onCompressed: (Long, Long) -> Unit,
-        body: (InputStream) -> T
+        body: (InputStream) -> T,
+        checkCancel: () -> Unit = {}
     ): T {
         val dOff = dataOffset(e)
         streamRange(dOff, dOff + e.csize - 1).use { raw ->
-            val counting = CountingStream(raw, onCompressed)
+            val counting = CountingStream(raw, onCompressed, checkCancel)
             val src: InputStream = if (e.method == 8)
                 InflaterInputStream(counting, Inflater(true), BUF) else counting
             return body(src)
@@ -232,29 +238,42 @@ class RemoteZip(val url: String) {
     }
 
     /** 提取整个条目到输出流。 */
-    fun extractEntry(e: Entry, out: OutputStream, onProgress: (Long, Long) -> Unit) {
-        streamEntry(e, { c, _ -> onProgress(c, e.csize) }) { ins -> ins.copyTo(out, BUF) }
-        out.flush()
+    fun extractEntry(e: Entry, out: OutputStream, onProgress: (Long, Long) -> Unit, checkCancel: () -> Unit = {}) {
+        streamEntry(e, { c, _ -> onProgress(c, e.csize) }, { ins ->
+            val buf = ByteArray(BUF)
+            while (true) {
+                checkCancel()
+                val n = ins.read(buf)
+                if (n < 0) break
+                out.write(buf, 0, n)
+            }
+            out.flush()
+        }, checkCancel)
     }
 
     private class CountingStream(
         ins: InputStream,
-        private val onCount: (Long, Long) -> Unit
+        private val onCount: (Long, Long) -> Unit,
+        private val checkCancel: () -> Unit
     ) : InputStream() {
         private val src: InputStream = ins
         var count = 0L
             private set
         private val one = ByteArray(1)
+        private var lastCheck = 0L
 
         override fun read(): Int {
             val n = src.read(one, 0, 1)
-            if (n > 0) { count += n; onCount(count, -1) }
+            if (n > 0) { count += n; onCount(count, -1); maybeCancel() }
             return if (n == 1) one[0].toInt() and 0xff else -1
         }
         override fun read(b: ByteArray, off: Int, len: Int): Int {
             val n = src.read(b, off, len)
-            if (n > 0) { count += n; onCount(count, -1) }
+            if (n > 0) { count += n; onCount(count, -1); maybeCancel() }
             return n
+        }
+        private fun maybeCancel() {
+            if (count - lastCheck > (1 shl 19)) { lastCheck = count; checkCancel() }
         }
         override fun close() = src.close()
     }

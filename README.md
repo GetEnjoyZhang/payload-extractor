@@ -13,12 +13,26 @@
 对增量包（含 MOVE / BSDIFF / SOURCE_COPY / SOURCE_BSDIFF / PUFFDIFF 操作）会明确报错，
 因为仅凭 OTA 包无法脱离底包重建。
 
+## 功能特性（v1.2）
+
+- 🧊 **液态玻璃 UI**：渐变底 + 半透明玻璃卡片 + 高光描边，浅色 / 深色模式自适应
+- 🔍 **搜索镜像**：列表实时过滤，可勾选「仅 .img」快速筛选镜像文件
+- 📊 **行内进度**：每个条目/分区独立进度条 + 实时速度（MB/s），完成即可分享
+- 📦 **OTA 信息卡**：自动解析 `META-INF/com/android/metadata` 显示文件大小、设备、文件名
+- 🗂 **payload 分区列表**：点击 payload.bin 即切换到分区视图，可一键「全部提取」
+- ✋ **任务取消**：任意时刻可取消当前下载
+- 📱 **厂商兼容**（v1.2）：自动识别小米等厂商的 payload 变体
+  - payload 头部**大端字节序**自动探测（标准 AOSP 为小端）
+  - **新版 manifest 字段编号**（block_size=3、partitions=13、dst extents=6）
+  - 流式解压写入，任意大小分区（>2GB 的 super 子分区）不再占用大量内存
+
 ## 安装使用
 
 - 安装 `PayloadExtractor.apk`（Android 8.0 / API 26 及以上）
-- 粘贴 OTA zip 直链 URL（若剪贴板里是 .zip 链接会自动填入），点「解析 ZIP 目录」
-- 点击条目提取；结果保存在应用目录 `Android/data/com.zcode.payloadextractor/files/extracted/`，
-  可通过弹窗「分享」发送到任意位置
+- 粘贴 OTA zip 直链 URL（若剪贴板里是 .zip 链接会自动填入），点「解析」
+- 搜索框过滤镜像 → 点行内「提取」或「全部提取」
+- 结果保存在应用目录 `Android/data/com.zcode.payloadextractor/files/extracted/`，
+  完成后可通过弹窗或行内「分享」按钮发送到任意位置
 
 ## 工程结构
 
@@ -26,8 +40,8 @@
 app/src/main/java/com/zcode/payloadextractor/
   core/RemoteZip.kt      远程 ZIP：Range 探测、EOCD/ZIP64 中央目录解析、按需读取/流式解压
   core/PayloadReader.kt  payload.bin：头部 + 极简 protobuf 解析 manifest（分区/操作/extent）
-  core/Extractor.kt      条目提取 + 分区重建（随机访问与流式两条路径）
-  MainActivity.kt        界面（无 androidx 依赖，纯 framework 控件）
+  core/Extractor.kt      条目提取 + 分区重建（随机访问与流式两条路径），支持取消
+  MainActivity.kt        界面（无 androidx 依赖，纯 framework 控件 + 液态玻璃皮肤）
   ShareProvider.kt       content:// 分享提取结果
 app/src/test/kotlin/test/DesktopTest.kt  桌面 JVM 测试（合成 payload + 本地 Range 服务器 + 真实 URL）
 ```
@@ -75,6 +89,7 @@ java -jar <build-tools>/lib/apksigner.jar sign --ks ks.jks --out PayloadExtracto
 - T3 增量包（PUFFDIFF）正确拒绝
 - T4 普通条目(deflate) 96MB 提取
 - T5 传入真实 OTA URL：解析目录 + 提取 boot.img 校验 `ANDROID!` 魔数与大小
+- MiuiDiag：真实小米 V14 包（大端头部 + 新版 manifest schema）解析 34 个分区并提取 vbmeta 校验 `AVB0`
 
 ```bash
 java -cp out_core;kotlin-stdlib;libs/* test.DesktopTestKt <OTA zip URL>

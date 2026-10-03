@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 高光环 -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="@color/card_stroke_start"
+                android:endColor="@color/card_stroke_end"
+                android:type="linear" />
+            <corners android:radius="26dp" />
+        </shape>
+    </item>
+    <!-- 内缩 1dp 的渐变按钮主体 -->
+    <item
+        android:left="1dp"
+        android:top="1dp"
+        android:right="1dp"
+        android:bottom="1dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="0"
+                android:startColor="@color/btn_g1"
+                android:endColor="@color/btn_g2"
+                android:type="linear" />
+            <corners android:radius="25dp" />
+        </shape>
+    </item>
+</layer-list>

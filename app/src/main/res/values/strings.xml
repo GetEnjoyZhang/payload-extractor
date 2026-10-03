@@ -1,4 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Payload 在线提取</string>
+    <string name="title">OTA 在线提取</string>
+    <string name="subtitle">远程 zip + payload.bin 按需 Range 提取，无需下载整包</string>
+    <string name="input_title">输入</string>
+    <string name="hint_url">粘贴 OTA 包 zip 的 URL (http/https)</string>
+    <string name="parse">解析</string>
+    <string name="parsing">正在解析远程 ZIP 中央目录…</string>
+    <string name="ota_info">OTA 信息</string>
+    <string name="label_size">文件大小</string>
+    <string name="label_device">设备</string>
+    <string name="label_filename">文件名</string>
+    <string name="label_entries">条目数</string>
+    <string name="image_list">镜像列表</string>
+    <string name="search_hint">搜索镜像名称…</string>
+    <string name="img_only">仅 .img</string>
+    <string name="extract">提取</string>
+    <string name="extract_all">全部提取</string>
+    <string name="back_entries">‹ 返回条目</string>
+    <string name="cancel">取消</string>
+    <string name="done_ok">完成</string>
+    <string name="share">分享</string>
+    <string name="close">关闭</string>
+    <string name="save_path_hint">保存于 Android/data/com.zcode.payloadextractor/files/extracted/</string>
 </resources>

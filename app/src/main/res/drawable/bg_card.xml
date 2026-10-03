@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 第 1 层：渐变（将只露出边缘 1dp 作为高光描边） -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="@color/card_stroke_start"
+                android:endColor="@color/card_stroke_end"
+                android:type="linear" />
+            <corners android:radius="26dp" />
+        </shape>
+    </item>
+    <!-- 第 2 层：内缩 1dp 的半透明玻璃填充 -->
+    <item
+        android:left="1dp"
+        android:top="1dp"
+        android:right="1dp"
+        android:bottom="1dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/card_fill" />
+            <corners android:radius="25dp" />
+        </shape>
+    </item>
+</layer-list>

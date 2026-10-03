@@ -86,7 +86,7 @@ fun main() {
     // 完整流式解压
     var total = 0L
     val chunks = ArrayList<Int>()
-    z.streamEntry(e, { _, _ -> }) { ins ->
+    z.streamEntry(e, { _, _ -> }, { ins ->
         val buf = ByteArray(4096)
         while (true) {
             val n = ins.read(buf)
@@ -94,7 +94,7 @@ fun main() {
             total += n
             if (chunks.size < 40) chunks.add(n)
         }
-    }
+    })
     println("流式解压总长 = $total (期望 usize=${e.usize})")
     println("前几次 read 返回: $chunks")
 }
