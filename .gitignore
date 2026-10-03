@@ -1,0 +1,24 @@
+# 本地构建产物
+out*/
+dexout/
+classes.jar
+classes.dex
+res.zip
+base.apk
+aligned.apk
+*.apk
+
+# 签名密钥（绝不提交）
+*.jks
+*.keystore
+
+# 桌面测试产物
+build_t*.img
+test_out*.txt
+compile_err.txt
+stack*.txt
+
+# 工具链与临时文件
+_dl/
+ghtool/
+*.zip
