@@ -1,5 +1,11 @@
 # Payload 在线提取 (PayloadExtractor)
 
+[![APK 下载](https://img.shields.io/github/downloads/GetEnjoyZhang/payload-extractor/total?style=flat-square&label=APK%E4%B8%8B%E8%BD%BD)](https://github.com/GetEnjoyZhang/payload-extractor/releases/latest)
+[![Stars](https://img.shields.io/github/stars/GetEnjoyZhang/payload-extractor?style=flat-square)](https://github.com/GetEnjoyZhang/payload-extractor/stargazers)
+[![Release](https://img.shields.io/github/v/release/GetEnjoyZhang/payload-extractor?style=flat-square&label=%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC)](https://github.com/GetEnjoyZhang/payload-extractor/releases/latest)
+[![Fork](https://img.shields.io/github/forks/GetEnjoyZhang/payload-extractor?style=flat-square)](https://github.com/GetEnjoyZhang/payload-extractor/network/members)
+[![License](https://img.shields.io/github/license/GetEnjoyZhang/payload-extractor?style=flat-square&label=%E8%AE%B8%E5%8F%AF%E8%AF%81)](LICENSE)
+
 一个安卓小工具：**输入 OTA 包 zip 的 URL，在线解析并按需提取分区镜像（如 boot.img），无需下载整个几个 GB 的包。**
 
 原理同 payload dumper / "payload dumper online"：
