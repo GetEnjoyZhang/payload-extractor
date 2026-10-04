@@ -1,0 +1,49 @@
+<view class="page">
+  <view class="title">OTA 在线提取</view>
+  <view class="subtitle">小程序版 · 远程 zip + payload.bin 按需 Range 提取</view>
+
+  <view class="card">
+    <view class="card-title">输入</view>
+    <input class="url" value="{{url}}" bindinput="onUrl" placeholder="粘贴 OTA 包 zip 的 URL (https)" />
+  </view>
+
+  <button class="btn" bindtap="startParse" disabled="{{busy}}">{{parseText}}</button>
+
+  <view class="card" wx:if="{{infoShow}}">
+    <view class="card-title">OTA 信息</view>
+    <view class="info-row">
+      <view class="info-col"><view class="lbl">文件大小</view><view class="val">{{infoSize}}</view></view>
+      <view class="info-col"><view class="lbl">条目数</view><view class="val">{{infoEntries}}</view></view>
+      <view class="info-col"><view class="lbl">设备</view><view class="val">{{infoDevice}}</view></view>
+    </view>
+    <view class="info-file">{{infoName}}</view>
+  </view>
+
+  <view class="list-head" wx:if="{{infoShow}}">
+    <view class="back" wx:if="{{mode === 'partitions'}}" catchtap="goBack">‹ 返回条目</view>
+    <view class="list-label">镜像列表</view>
+    <view class="extract-all" catchtap="extractAll">全部提取(.img)</view>
+  </view>
+
+  <view class="search-row" wx:if="{{infoShow}}">
+    <input class="search" placeholder="搜索镜像名称…" bindinput="onSearch" />
+    <checkbox class="imgonly" checked="{{imgOnly}}" bindchange="toggleImgOnly">仅 .img</checkbox>
+  </view>
+
+  <scroll-view scroll-y class="list" wx:if="{{infoShow}}">
+    <view class="item" wx:for="{{list}}" wx:key="key">
+      <view class="icon {{item.iconClass}}">{{item.icon}}</view>
+      <view class="item-mid">
+        <view class="item-name">{{item.name}}</view>
+        <view class="item-meta {{item.metaClass}}">{{item.meta}}</view>
+        <progress wx:if="{{item.active}}" class="bar" percent="{{item.pct}}" stroke-width="4"
+          activeColor="#3B82F6" backgroundColor="rgba(130,140,170,0.3)" border-radius="3" />
+      </view>
+      <button class="pill" size="mini" disabled="{{item.btnDisabled}}"
+        data-key="{{item.key}}" catchtap="onItemBtn">{{item.btnText}}</button>
+    </view>
+    <view wx:if="{{!list.length}}" class="empty">无匹配项\n试试清除搜索或取消「仅 .img」</view>
+  </scroll-view>
+
+  <view class="footer">{{statusText}}\n自用说明：需在开发者工具勾选「不校验合法域名」，手机预览需打开调试。</view>
+</view>

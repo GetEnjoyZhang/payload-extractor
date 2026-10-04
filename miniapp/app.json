@@ -1,0 +1,13 @@
+{
+  "pages": ["pages/index/index"],
+  "window": {
+    "navigationBarTitleText": "OTA 在线提取",
+    "navigationBarBackgroundColor": "#eef3ff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#eef3ff"
+  },
+  "darkmode": true,
+  "themeLocation": "theme.json",
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

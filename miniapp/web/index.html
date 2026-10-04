@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OTA 在线提取 · Payload Web</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+  <div class="title">OTA 在线提取</div>
+  <div class="subtitle">网页版 · 远程 zip + payload.bin 按需 Range 提取 · 核心逻辑与安卓/小程序版一致</div>
+
+  <div class="card">
+    <div class="card-title">输入</div>
+    <input id="url" class="url" placeholder="粘贴 OTA 包 zip 的 URL (https)">
+  </div>
+
+  <button id="parseBtn" class="btn">解析</button>
+
+  <div class="card" id="infoCard" hidden>
+    <div class="card-title">OTA 信息</div>
+    <div class="info-row">
+      <div class="info-col"><div class="lbl">文件大小</div><div class="val" id="infoSize"></div></div>
+      <div class="info-col"><div class="lbl">条目数</div><div class="val" id="infoEntries"></div></div>
+      <div class="info-col"><div class="lbl">设备</div><div class="val" id="infoDevice"></div></div>
+    </div>
+    <div class="info-file" id="infoName"></div>
+  </div>
+
+  <div class="list-head" id="listHead" hidden>
+    <div class="back" id="backBtn" hidden>‹ 返回条目</div>
+    <div class="list-label">镜像列表</div>
+    <div class="extract-all" id="extractAll">全部提取(.img)</div>
+  </div>
+
+  <div class="search-row" id="searchRow" hidden>
+    <input id="search" class="search" placeholder="搜索镜像名称…">
+    <label class="imgonly"><input type="checkbox" id="imgOnly"> 仅 .img</label>
+  </div>
+
+  <div id="list"></div>
+
+  <div class="footer" id="statusText">提取的文件通过浏览器下载，保存到你的「下载」文件夹（大文件建议使用 Chrome/Edge，会询问保存位置）</div>
+
+  <details class="proxy-box">
+    <summary>代理设置（部分 OTA 服务器无 CORS 头，直连失败时需要）</summary>
+    <div class="proxy-inner">
+      <input id="proxyUrl" class="url" placeholder="代理地址，如 http://127.0.0.1:8787">
+      <div class="proxy-hint">
+        启动本地代理: <code>node web/tools/proxy.js 8787</code>，然后在此填入
+        <code>http://127.0.0.1:8787</code>。也可把 <code>web/tools/cf-worker.js</code> 部署到
+        Cloudflare Workers（免费）长期使用。设置保存在本机浏览器。
+      </div>
+    </div>
+  </details>
+</div>
+<script src="dist/bundle.js"></script>
+</body>
+</html>

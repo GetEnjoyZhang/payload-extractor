@@ -1,0 +1,41 @@
+{
+  "appid": "touristappid",
+  "compileType": "miniprogram",
+  "projectname": "MiniPayload",
+  "libVersion": "3.4.10",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "minified": true,
+    "ignoreUploadUnusedFiles": true
+  },
+  "packOptions": {
+    "ignore": [
+      {
+        "type": "folder",
+        "value": "web"
+      },
+      {
+        "type": "folder",
+        "value": "test"
+      },
+      {
+        "type": "folder",
+        "value": "node_modules"
+      },
+      {
+        "type": "file",
+        "value": "package.json"
+      },
+      {
+        "type": "file",
+        "value": "package-lock.json"
+      },
+      {
+        "type": "file",
+        "value": "README.md"
+      }
+    ]
+  }
+}

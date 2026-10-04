@@ -1,0 +1,4 @@
+/* 页面级样式继承 app.wxss 的 CSS 变量 */
+.page {
+  padding: 24rpx 24rpx 60rpx;
+}

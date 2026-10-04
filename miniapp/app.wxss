@@ -1,0 +1,257 @@
+/* 液态玻璃风格 · 浅色 */
+page {
+  --bg1: #dce9ff;
+  --bg2: #efd9f6;
+  --bg3: #d8f3ef;
+  --card: rgba(255, 255, 255, 0.55);
+  --card-stroke: rgba(255, 255, 255, 0.75);
+  --on-bg: #101527;
+  --hint: #5b6478;
+  --accent: #2f6bff;
+  --pill-bg: rgba(220, 240, 255, 0.85);
+  --track: rgba(120, 130, 160, 0.25);
+  --success: #16a34a;
+  --fail: #e11d48;
+  background: linear-gradient(160deg, var(--bg1), var(--bg2) 55%, var(--bg3));
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+@media (prefers-color-scheme: dark) {
+  page {
+    --bg1: #0b1026;
+    --bg2: #1b1442;
+    --bg3: #0e2e3e;
+    --card: rgba(255, 255, 255, 0.08);
+    --card-stroke: rgba(255, 255, 255, 0.22);
+    --on-bg: #f1f4ff;
+    --hint: #98a2c0;
+    --accent: #6ea8ff;
+    --pill-bg: rgba(90, 140, 255, 0.18);
+    --track: rgba(255, 255, 255, 0.14);
+    --success: #34d399;
+    --fail: #fb7185;
+  }
+}
+
+.page {
+  padding: 24rpx 24rpx 40rpx;
+  color: var(--on-bg);
+}
+
+.title {
+  font-size: 44rpx;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 22rpx;
+  color: var(--hint);
+  margin: 4rpx 0 20rpx;
+}
+
+.card {
+  background: var(--card);
+  border: 1rpx solid var(--card-stroke);
+  border-radius: 28rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  margin-bottom: 14rpx;
+}
+
+.url {
+  background: rgba(140, 150, 180, 0.14);
+  border-radius: 18rpx;
+  padding: 16rpx 20rpx;
+  font-size: 24rpx;
+  min-height: 60rpx;
+}
+
+.btn {
+  background: linear-gradient(90deg, #3b82f6, #2f5bff);
+  color: #fff;
+  border-radius: 48rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  border: none;
+  margin-bottom: 20rpx;
+}
+
+.btn[disabled] {
+  opacity: 0.55;
+  color: #fff;
+  background: linear-gradient(90deg, #3b82f6, #2f5bff);
+}
+
+.info-row {
+  display: flex;
+}
+
+.info-col {
+  flex: 1;
+}
+
+.lbl {
+  font-size: 20rpx;
+  color: var(--hint);
+}
+
+.val {
+  font-size: 27rpx;
+  font-weight: 700;
+  margin-top: 4rpx;
+}
+
+.info-file {
+  font-size: 20rpx;
+  color: var(--hint);
+  margin-top: 12rpx;
+  word-break: break-all;
+}
+
+.list-head {
+  display: flex;
+  align-items: center;
+  margin: 8rpx 4rpx 12rpx;
+}
+
+.back {
+  color: var(--accent);
+  font-size: 26rpx;
+  margin-right: 16rpx;
+}
+
+.list-label {
+  flex: 1;
+  color: var(--hint);
+  font-size: 24rpx;
+}
+
+.extract-all {
+  color: var(--accent);
+  font-size: 24rpx;
+  font-weight: 700;
+  background: var(--pill-bg);
+  border-radius: 24rpx;
+  padding: 6rpx 20rpx;
+}
+
+.search-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 14rpx;
+}
+
+.search {
+  flex: 1;
+  background: rgba(140, 150, 180, 0.14);
+  border-radius: 18rpx;
+  padding: 12rpx 20rpx;
+  font-size: 24rpx;
+}
+
+.imgonly {
+  margin-left: 10rpx;
+  font-size: 24rpx;
+  transform: scale(0.85);
+}
+
+.list {
+  height: 62vh;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  background: var(--card);
+  border: 1rpx solid var(--card-stroke);
+  border-radius: 26rpx;
+  padding: 20rpx;
+  margin-bottom: 14rpx;
+}
+
+.icon {
+  width: 78rpx;
+  height: 78rpx;
+  border-radius: 22rpx;
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon-img { background: #5b9bff; }
+.icon-pay { background: #a78bfa; }
+.icon-dat { background: #94a3b8; }
+
+.item-mid {
+  flex: 1;
+  margin: 0 18rpx;
+  min-width: 0;
+}
+
+.item-name {
+  font-size: 27rpx;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-meta {
+  font-size: 21rpx;
+  color: var(--hint);
+  margin-top: 4rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta-accent { color: var(--accent); }
+.meta-ok { color: var(--success); }
+.meta-fail { color: var(--fail); }
+
+.bar {
+  margin-top: 8rpx;
+}
+
+.pill {
+  background: var(--pill-bg);
+  color: var(--accent);
+  border: none;
+  border-radius: 26rpx;
+  font-size: 23rpx;
+  font-weight: 700;
+  flex-shrink: 0;
+  line-height: 2.2;
+  padding: 0 24rpx;
+}
+
+.pill[disabled] {
+  opacity: 0.5;
+  color: var(--accent);
+  background: var(--pill-bg);
+}
+
+.empty {
+  text-align: center;
+  color: var(--hint);
+  font-size: 24rpx;
+  padding: 60rpx 0;
+  white-space: pre-line;
+}
+
+.footer {
+  font-size: 20rpx;
+  color: var(--hint);
+  margin-top: 16rpx;
+  line-height: 1.6;
+}

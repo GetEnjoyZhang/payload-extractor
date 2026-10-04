@@ -1,0 +1,12 @@
+{
+  "name": "minipayload-web",
+  "private": true,
+  "description": "Payload 在线提取 · 网页版（复用 utils 核心）",
+  "scripts": {
+    "build": "esbuild web/main.js --bundle --format=iife --outfile=web/dist/bundle.js --minify --external:crypto --external:buffer",
+    "proxy": "node web/tools/proxy.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.5"
+  }
+}
