@@ -23,4 +23,9 @@
     <string name="share">分享</string>
     <string name="close">关闭</string>
     <string name="save_path_hint">保存于 Android/data/com.zcode.payloadextractor/files/extracted/</string>
+    <string name="settings">设置</string>
+    <string name="about_title">关于本项目</string>
+    <string name="about_body">Payload 在线提取 v\$v\n输入 OTA 包 zip 的 URL，远程解析 payload.bin，按需提取分区镜像，无需下载整包。\n\n增量包（含 MOVE/BSDIFF 等操作）需要底包，不支持在线重建。</string>
+    <string name="open_project">打开项目主页</string>
+    <string name="project_url">https://github.com/GetEnjoyZhang/payload-extractor</string>
 </resources>

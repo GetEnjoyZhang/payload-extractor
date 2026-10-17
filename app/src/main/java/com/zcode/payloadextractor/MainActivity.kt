@@ -79,6 +79,7 @@ class MainActivity : Activity() {
     private lateinit var searchEdit: EditText
     private lateinit var imgOnly: CheckBox
     private lateinit var list: ListView
+    private lateinit var settingsBtn: TextView
     private lateinit var statusText: TextView
 
     private var zip: RemoteZip? = null
@@ -219,6 +220,7 @@ class MainActivity : Activity() {
         imgOnly = findViewById(R.id.imgOnly)
         list = findViewById(R.id.list)
         statusText = findViewById(R.id.statusText)
+        settingsBtn = findViewById(R.id.settingsBtn)
         list.emptyView = findViewById(R.id.emptyText)
 
         adapter = RowAdapter { rows }
@@ -233,6 +235,7 @@ class MainActivity : Activity() {
         } catch (_: Exception) {}
 
         parseBtn.setOnClickListener { startParse() }
+        settingsBtn.setOnClickListener { showAbout() }
         backBtn.setOnClickListener {
             mode = Mode.ENTRIES
             backBtn.visibility = View.GONE
@@ -755,6 +758,29 @@ class MainActivity : Activity() {
             .setTitle("提取完成（已校验）")
             .setMessage("${ref.name}\n\n${ref.location}")
             .setPositiveButton(R.string.share) { _, _ -> share(ref) }
+            .setNegativeButton(R.string.close, null)
+            .show()
+    }
+
+    /** 右上角设置 → 关于本项目（含项目地址，可跳转浏览器）。 */
+    private fun showAbout() {
+        val ver = try {
+            packageManager.getPackageInfo(packageName, 0).versionName ?: "?"
+        } catch (_: Exception) { "?" }
+        val url = getString(R.string.project_url)
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.about_title))
+            .setMessage(
+                getString(R.string.about_body).replace("\$v", ver) +
+                    "\n\n" + url
+            )
+            .setPositiveButton(R.string.open_project) { _, _ ->
+                try {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                } catch (e: Exception) {
+                    toast("没有可打开链接的应用")
+                }
+            }
             .setNegativeButton(R.string.close, null)
             .show()
     }

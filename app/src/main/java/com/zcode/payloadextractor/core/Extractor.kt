@@ -3,6 +3,7 @@ package com.zcode.payloadextractor.core
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
 import org.brotli.dec.BrotliInputStream
 import org.tukaani.xz.XZInputStream
+import com.github.luben.zstd.ZstdInputStreamNoFinalizer
 import java.io.ByteArrayInputStream
 import java.io.Closeable
 import java.io.File
@@ -60,7 +61,7 @@ private class ChannelImage(
  * - 任意条目（直接解压保存）
  * - payload.bin 中的分区（只下载该分区用到的数据块，重建出原始镜像）
  *
- * 支持的操作: REPLACE / REPLACE_BZ / REPLACE_XZ / REPLACE_BROTLI / ZERO / DISCARD。
+ * 支持的操作: REPLACE / REPLACE_BZ / REPLACE_XZ / REPLACE_BROTLI / ZSTD / ZERO / DISCARD。
  * 含 MOVE/BSDIFF/SOURCE_COPY/SOURCE_BSDIFF/PUFFDIFF 的增量包需要旧镜像，明确报错。
  */
 object Extractor {
@@ -164,6 +165,13 @@ object Extractor {
             1 -> BZip2CompressorInputStream(ByteArrayInputStream(raw))          // REPLACE_BZ
             8 -> XZInputStream(ByteArrayInputStream(raw))                       // REPLACE_XZ
             11 -> BrotliInputStream(ByteArrayInputStream(raw))                  // REPLACE_BROTLI
+            14 -> {                                                             // ZSTD (HyperOS 新包)
+                try {
+                    ZstdInputStreamNoFinalizer(ByteArrayInputStream(raw))
+                } catch (e: IOException) {
+                    throw IOException("ZSTD 解压初始化失败: ${e.message}")
+                }
+            }
             else -> throw IOException("不支持的操作类型 ${a.op.type}")
         }
         src.use { ins ->

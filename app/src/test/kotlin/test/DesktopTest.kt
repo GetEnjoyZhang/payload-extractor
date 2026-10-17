@@ -80,6 +80,44 @@ private fun buildPayload(withUnsupportedOp: Boolean = false): ByteArray {
     return head + manifest + data
 }
 
+// ---------- 合成 payload（含 ZSTD op type=14，HyperOS 新包形式） ----------
+private fun buildPayloadZstd(): ByteArray {
+    val bs = 4096L
+    fun zstdOf(b: ByteArray): ByteArray {
+        val os = ByteArrayOutputStream()
+        val zs = com.github.luben.zstd.ZstdOutputStreamNoFinalizer(os)
+        zs.write(b); zs.close()
+        return os.toByteArray()
+    }
+    val aData = ByteArray((4 * bs).toInt()) { 'A'.code.toByte() }
+    val bData = ByteArray((2 * bs).toInt()) { 'B'.code.toByte() }
+    val bZstd = zstdOf(bData)
+
+    var off = 0L
+    fun op(type: Int, dst: Pair<Long, Long>, data: ByteArray): ByteArray {
+        var bytes = byteArrayOf()
+        bytes += fVar(1, type.toLong())
+        bytes += fVar(2, off)
+        bytes += fVar(3, data.size.toLong())
+        bytes += fBytes(5, ext(dst.first, dst.second))
+        off += data.size
+        return bytes
+    }
+    val op1 = op(0, Pair(0, 4), aData)              // REPLACE
+    val op2 = op(14, Pair(4, 2), bZstd)             // ZSTD
+    val op3 = fVar(1, 6) + fBytes(5, ext(6, 2))     // ZERO
+    val partition = fStr(1, "boot") +
+        fBytes(8, op1) + fBytes(8, op2) + fBytes(8, op3)
+    val manifest = fVar(2, bs) + fBytes(6, partition)
+    val data = aData + bZstd
+
+    val head = "CrAU".toByteArray() +
+        java.nio.ByteBuffer.allocate(8).order(java.nio.ByteOrder.LITTLE_ENDIAN).putLong(2).array() +
+        java.nio.ByteBuffer.allocate(8).order(java.nio.ByteOrder.LITTLE_ENDIAN).putLong(manifest.size.toLong()).array() +
+        java.nio.ByteBuffer.allocate(4).order(java.nio.ByteOrder.LITTLE_ENDIAN).putInt(0).array()
+    return head + manifest + data
+}
+
 // ---------- zip 打包 ----------
 private fun zipOf(entries: Map<String, ByteArray>, deflate: Boolean): ByteArray {
     val bos = ByteArrayOutputStream()
@@ -231,6 +269,28 @@ fun main(args: Array<String>) {
         check(out.readBytes().sliceArray(0 until 1000).contentEquals(fake.sliceArray(0 until 1000))) { "内容不符" }
         out.delete()
         p("  ✓ 普通条目解压正确 (96MB)")
+    }
+
+    // ---- 测试6: ZSTD 操作 (HyperOS 新包, type=14) ----
+    p("[T6] payload.bin ZSTD 操作 (随机访问)")
+    run {
+        val p6 = buildPayloadZstd()
+        val url6 = serve(zipOf(mapOf("payload.bin" to p6), deflate = false))
+        val z = RemoteZip(url6); z.open()
+        val e = z.listEntries().first { it.name == "payload.bin" }
+        val mf = PayloadReader.parse { off, len -> z.readEntryBytes(e, off, len) }
+        val out = java.io.File("build_t6_boot.img")
+        val sink6 = com.zcode.payloadextractor.core.OutputImage.of(out)
+        Extractor.extractPartition(z, e, mf, mf.partitions[0], sink6, { ph, c, t -> p("    $ph $c/$t") })
+        sink6.close()
+        val bs = 4096
+        val got = out.readBytes()
+        check(got.size == 8 * bs) { "T6 大小不符: ${got.size}" }
+        check((0 until 4 * bs).all { got[it] == 'A'.code.toByte() }) { "T6 A 块不符" }
+        check((4 * bs until 6 * bs).all { got[it] == 'B'.code.toByte() }) { "T6 B 块不符 (ZSTD 解压错误)" }
+        check((6 * bs until 8 * bs).all { got[it] == 0.toByte() }) { "T6 零块不符" }
+        out.delete()
+        p("  ✓ ZSTD 分区重建内容正确")
     }
 
     // ---- 测试5: 真实 URL (可传入参数则执行) ----
