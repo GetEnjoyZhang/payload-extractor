@@ -2,7 +2,7 @@
 var zlib = require("zlib");
 var { crc32 } = require("../utils/xz.js");
 
-function buildSyntheticPayload(withPuffdiff) {
+function buildSyntheticPayload(withPuffdiff, zstData) {
   function varint(v) { v = BigInt(v); var o = []; while (true) { if ((v & ~0x7fn) === 0n) { o.push(Number(v)); break; } o.push(Number((v & 0x7fn) | 0x80n)); v >>= 7n; } return Uint8Array.from(o); }
   function fVar(n, v) { return concat([Uint8Array.from(varint((n << 3) | 0)), Uint8Array.from(varint(v))]); }
   function fBytes(n, b) { return concat([Uint8Array.from(varint((n << 3) | 2)), Uint8Array.from(varint(b.length)), b]); }
@@ -18,6 +18,19 @@ function buildSyntheticPayload(withPuffdiff) {
     if (data) { parts.push(fVar(2, off)); parts.push(fVar(3, data.length)); off += data.length; }
     parts.push(fBytes(6, ext(dst[0], dst[1]))); // 新 schema: dst extents = 字段 6
     return concat(parts);
+  }
+  if (zstData) {
+    // ZSTD 版（HyperOS 新包形式, type=14）: A(0-3) + ZSTD(4-5) + ZERO(6-7)
+    var opA = opRaw(0, [0, 4], aData);
+    var opZ = opRaw(14, [4, 2], zstData);
+    var op30 = concat([fVar(1, 6), fBytes(6, ext(6, 2))]); // ZERO
+    var pZ = concat([fStr(1, "boot"), fBytes(8, opA), fBytes(8, opZ), fBytes(8, op30)]);
+    var mfZ = concat([fVar(3, 4096), fBytes(13, pZ)]);
+    var headZ = Buffer.from("CrAU");
+    var verZ = Buffer.alloc(8); verZ.writeUInt32BE(0, 0); verZ.writeUInt32BE(2, 4);
+    var mlZ = Buffer.alloc(8); mlZ.writeUInt32BE(0, 0); mlZ.writeUInt32BE(mfZ.length, 4);
+    var msZ = Buffer.alloc(4); msZ.writeUInt32BE(0, 0);
+    return Buffer.concat([headZ, verZ, mlZ, msZ, mfZ, aData, zstData]);
   }
   var op1 = opRaw(0, [0, 4], aData);
   var op3 = concat([fVar(1, 6), fBytes(6, ext(6, 2))]); // ZERO

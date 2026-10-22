@@ -1,5 +1,5 @@
 // 分区/条目提取器 —— 移植自安卓版 Kotlin 实现
-// 支持 REPLACE(0) / REPLACE_BZ(1) / REPLACE_XZ(8) / REPLACE_BROTLI(11) / ZERO(6) / DISCARD(7)
+// 支持 REPLACE(0) / REPLACE_BZ(1) / REPLACE_XZ(8) / REPLACE_BROTLI(11) / ZSTD(14) / ZERO(6) / DISCARD(7)
 // sink: { setLength(len), writeAt(pos, u8), close() } 由调用方提供（小程序 fs / Node fs 适配）
 
 var pako = require("../vendor/pako.js");
@@ -8,6 +8,7 @@ var brotliDecompress = require("../vendor/brotli/entry.js");
 var lzma2mod = require("../vendor/lzma2.js");
 var LZMA2 = lzma2mod.LZMA || lzma2mod;
 var xz = require("./xz.js");
+var fzstd = require("../vendor/fzstd.js");
 
 var SOURCE_OPS = { 2: 1, 3: 1, 4: 1, 5: 1, 9: 1 }; // MOVE BSDIFF SOURCE_COPY SOURCE_BSDIFF PUFFDIFF
 var ZERO_OPS = { 6: 1, 7: 1 };                     // ZERO DISCARD
@@ -24,6 +25,7 @@ function decompressOp(type, raw) {
   }
   if (type === 8) return xz.decodeXZ(raw);
   if (type === 11) return brotliDecompress(raw);
+  if (type === 14) return fzstd.decompress(raw);
   throw unsupportedType(type);
 }
 

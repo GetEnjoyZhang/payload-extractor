@@ -130,6 +130,33 @@ function main() {
       });
     }); });
 
+  // T6: ZSTD 操作 (type=14, HyperOS 新包形式)
+  chain = chain.then(function () { return serve(
+    zipBytes([{ name: "payload.bin", data: buildSyntheticPayload(false, fs.readFileSync(path.join(__dirname, "t6_b.zst"))) }], false),
+    function (url) {
+      p("[T6] 合成 payload.bin ZSTD 操作 (type=14)");
+      var z = new RemoteZip(url, fetchRange);
+      return z.open().then(function () {
+        var e = z.entries.find(function (x) { return x.name === "payload.bin"; });
+        return payloadParser.parse(function (off, len) { return z.readEntryBytes(e, off, len); }).then(function (mf) {
+          var boot = mf.partitions[0];
+          if (boot.name !== "boot" || boot.size !== 32768) throw new Error("分区解析异常: " + boot.name + "/" + boot.size);
+          var out = path.join(__dirname, "t6_boot.img");
+          var sink = fileSink(out);
+          return ex.extractPartition(z, e, mf, boot, sink).then(function () {
+            sink.close();
+            var d = fs.readFileSync(out);
+            if (d.length !== 32768) throw new Error("大小不符");
+            for (var i = 0; i < 4 * 4096; i++) if (d[i] !== 0x41) throw new Error("块0-3 不是 A");
+            for (i = 4 * 4096; i < 6 * 4096; i++) if (d[i] !== 0x42) throw new Error("块4-5 不是 B (ZSTD 解压失败)");
+            for (i = 6 * 4096; i < 8 * 4096; i++) if (d[i] !== 0) throw new Error("块6-7 不是零");
+            p("  ✓ ZSTD 分区重建正确 (32768 字节)");
+            fs.unlinkSync(out);
+          }, function (err) { sink.close(); throw err; });
+        });
+      });
+    }); });
+
   if (includeReal) {
     // T4: 真实一加包
     chain = chain.then(function () {
