@@ -3,15 +3,15 @@
 输入 OTA 包 zip 的 URL，在线解析并按需提取分区镜像（boot.img 等），无需下载整包。原理同 payload dumper：HTTP Range 按需读取 + 本地解压重建，支持 SHA-256 / CRC32 自动校验。
 
 [![APK 下载](https://img.shields.io/github/downloads/GetEnjoyZhang/payload-extractor/total?style=flat-square&label=APK%E4%B8%8B%E8%BD%BD)](https://github.com/GetEnjoyZhang/payload-extractor/releases/latest)
-[![Stars](https://img.shields.io/github/stars/GetEnjoyZhang/payload-extractor?style=flat-square)](stargazers)
-[![Release](https://img.shields.io/github/v/release/GetEnjoyZhang/payload-extractor?style=flat-square&label=%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC)](releases/latest)
-[![License](https://img.shields.io/github/license/GetEnjoyZhang/payload-extractor?style=flat-square&label=%E8%AE%B8%E5%8F%AF%E8%AF%81)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/GetEnjoyZhang/payload-extractor?style=flat-square)](https://github.com/GetEnjoyZhang/payload-extractor/stargazers)
+[![Release](https://img.shields.io/github/v/release/GetEnjoyZhang/payload-extractor?style=flat-square&label=%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC)](https://github.com/GetEnjoyZhang/payload-extractor/releases/latest)
+[![License](https://img.shields.io/github/license/GetEnjoyZhang/payload-extractor?style=flat-square&label=%E8%AE%B8%E5%8F%AF%E8%AF%81)](https://github.com/GetEnjoyZhang/payload-extractor/blob/main/LICENSE)
 
 ## 三端版本
 
 | 版本 | 目录 | 说明 |
 |---|---|---|
-| 📱 安卓 App | [`app/`](app/) | 已签名 APK 在 [Releases](releases/latest)，Android 8.0+ 直接安装 |
+| 📱 安卓 App | [`app/`](app/) | 已签名 APK 在 [Releases](https://github.com/GetEnjoyZhang/payload-extractor/releases/latest)，Android 8.0+ 直接安装 |
 | 🌐 网页版 | [`miniapp/web/`](miniapp/web/) | **GitHub Pages 在线使用**（见下），或本地 `node proxy.js` 起代理 |
 | 💬 微信小程序 | [`miniapp/`](miniapp/) | 自用版：开发者工具导入，需开启「不校验合法域名」（平台限制，无法正式上架任意 URL 工具） |
 
@@ -35,7 +35,7 @@
 
 ## 安卓 App 使用
 
-- 安装 [Releases](releases/latest) 中的 `PayloadExtractor.apk`（Android 8.0+）
+- 安装 [Releases](https://github.com/GetEnjoyZhang/payload-extractor/releases/latest) 中的 `PayloadExtractor.apk`（Android 8.0+）
 - 粘贴 OTA zip 直链 URL → 解析 → 搜索镜像 → 行内「提取」或「全部提取」
 - 结果保存在应用目录 `Android/data/com.zcode.payloadextractor/files/extracted/` 或公共 Download，可随时分享
 - 对增量包（含 MOVE / BSDIFF / SOURCE_COPY / SOURCE_BSDIFF / PUFFDIFF 等操作）明确报错：仅凭 OTA 包无法脱离底包重建
