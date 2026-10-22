@@ -48,13 +48,61 @@
     <div class="proxy-inner">
       <input id="proxyUrl" class="url" placeholder="代理地址，如 http://127.0.0.1:8787">
       <div class="proxy-hint">
-        启动本地代理: <code>node web/tools/proxy.js 8787</code>，然后在此填入
-        <code>http://127.0.0.1:8787</code>。也可把 <code>web/tools/cf-worker.js</code> 部署到
-        Cloudflare Workers（免费）长期使用。设置保存在本机浏览器。
+        <b>推荐 · 自己部署一个 Cloudflare Worker（免费，约 2 分钟）</b>：<br>
+        1. 打开 <a href="https://dash.cloudflare.com/" target="_blank" rel="noopener">dash.cloudflare.com → Workers → Create Worker</a>，
+        部署新 Worker，删除示例代码，点击下方「复制 Worker 代码」→ 粘贴 → Deploy<br>
+        2. 在此填入 <code>https://你的worker名.你的子域.workers.dev</code>（Worker 详情页可见）<br>
+        本地一次性使用：<code>node web/tools/proxy.js 8787</code>，填入
+        <code>http://127.0.0.1:8787</code>。设置仅保存在本机浏览器。
       </div>
+      <button id="copyWorker" type="button" class="pill">复制 Worker 代码</button>
+      <textarea id="workerCode" class="worker-code" readonly rows="10" spellcheck="false"></textarea>
     </div>
   </details>
 </div>
+<script type="text/plain" id="workerCodeSrc">
+// Cloudflare Worker 版 CORS 代理（免费额度 10 万请求/天，无需备案）
+// 用法：粘贴后 Deploy，把代理地址（https://xxx.workers.dev）填入页面「代理设置」
+const ALLOW_HOSTS = null; // 可选：改为 ["要允许的域名1","域名2"] 限制白名单，防止被滥用
+export default {
+  async fetch(request) {
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "*",
+          "Access-Control-Allow-Methods": "GET,OPTIONS",
+          "Access-Control-Expose-Headers": "Content-Range, Content-Length, Content-Type"
+        }
+      });
+    }
+    const u = new URL(request.url);
+    const target = u.searchParams.get("u");
+    if (!target) return text("missing ?u=<encoded url>", 400);
+    let up;
+    try { up = new URL(target); } catch (e) { return text("bad url", 400); }
+    if (!/^https?:$/.test(up.protocol)) return text("bad protocol", 400);
+    if (ALLOW_HOSTS && !ALLOW_HOSTS.includes(up.hostname)) return text("host not allowed", 403);
+
+    const headers = {};
+    const range = request.headers.get("range");
+    if (range) headers.Range = range;
+
+    const resp = await fetch(target, { headers: headers });
+    const out = new Headers();
+    ["content-range", "content-length", "content-type"].forEach(function (h) {
+      const v = resp.headers.get(h);
+      if (v) out.set(h, v);
+    });
+    out.set("Access-Control-Allow-Origin", "*");
+    out.set("Access-Control-Expose-Headers", "Content-Range, Content-Length, Content-Type");
+    return new Response(resp.body, { status: resp.status, headers: out });
+  }
+};
+function text(s, code) {
+  return new Response(s, { status: code, headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "text/plain" } });
+}
+</script>
 <script src="dist/bundle.js"></script>
 </body>
 </html>

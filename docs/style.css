@@ -129,3 +129,6 @@ body {
 .proxy-inner { padding: 10px 4px; }
 .proxy-hint { margin-top: 8px; line-height: 1.6; }
 .proxy-hint code { background: rgba(140,150,180,0.18); border-radius: 4px; padding: 1px 5px; }
+.worker-code { margin-top: 8px; width: 100%; font: 11px/1.45 Consolas, monospace;
+  background: rgba(120,130,160,0.12); color: inherit; border: 1px solid rgba(140,150,180,0.25);
+  border-radius: 8px; padding: 8px; resize: vertical; }
