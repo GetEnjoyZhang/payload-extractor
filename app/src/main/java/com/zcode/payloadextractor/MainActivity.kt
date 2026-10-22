@@ -29,6 +29,7 @@ import com.zcode.payloadextractor.core.Extractor
 import com.zcode.payloadextractor.core.OperationCancelledException
 import com.zcode.payloadextractor.core.OutputImage
 import com.zcode.payloadextractor.core.PayloadReader
+import com.zcode.payloadextractor.core.DynamicUrl
 import com.zcode.payloadextractor.core.RemoteZip
 import java.io.File
 import java.io.FileInputStream
@@ -420,7 +421,16 @@ class MainActivity : Activity() {
         statusText.text = getString(R.string.parsing)
         thread {
             try {
-                val z = RemoteZip(url)
+                var realUrl = url
+                if (DynamicUrl.isDynamic(url)) {
+                    ui { statusText.text = "检测到 OPPO/一加动态链接，换取真实下载地址…" }
+                    realUrl = try {
+                        DynamicUrl.resolve(url)
+                    } catch (e: Exception) {
+                        throw RuntimeException("动态链接换址失败：${e.message}")
+                    }
+                }
+                val z = RemoteZip(realUrl)
                 z.open()
                 zip = z
                 entries = z.listEntries()
@@ -436,7 +446,7 @@ class MainActivity : Activity() {
                         }
                     } catch (_: Exception) {}
                 }
-                currentUrl = url
+                currentUrl = realUrl
                 ui {
                     infoCard.visibility = View.VISIBLE
                     listHeader.visibility = View.VISIBLE

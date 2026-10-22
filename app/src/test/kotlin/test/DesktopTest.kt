@@ -1,6 +1,7 @@
 package test
 
 import com.sun.net.httpserver.HttpServer
+import com.zcode.payloadextractor.core.DynamicUrl
 import com.zcode.payloadextractor.core.Extractor
 import com.zcode.payloadextractor.core.PayloadReader
 import com.zcode.payloadextractor.core.RemoteZip
@@ -291,6 +292,22 @@ fun main(args: Array<String>) {
         check((6 * bs until 8 * bs).all { got[it] == 0.toByte() }) { "T6 零块不符" }
         out.delete()
         p("  ✓ ZSTD 分区重建内容正确")
+    }
+
+    // ---- 测试7: OPPO/一加动态链接换址 ----
+    p("[T7] DynamicUrl 动态链接换址")
+    run {
+        check(DynamicUrl.isDynamic("https://component-ota-cn.allawntech.com/downloadCheck?c=1&p=2&g=3&s=4")) { "isDynamic 应识别" }
+        check(!DynamicUrl.isDynamic("https://example.com/downloadCheck?c=1")) { "非 OPPO 域名不应识别" }
+        // 用户实际反馈的已过期链接: 应报明确的失效错误(2306)而不是含糊失败
+        val expired = "https://component-ota-cn.allawntech.com/downloadCheck?c=8e3af519d9b021799ec4a35590a19ff7&p=a6c78fdd375d888b39ce89f94b9764359477f5b41b3554f282bb03bd9f7c5897efe9628ae42d3575b96dd3282179&d=e181cd82745f88956e8098ec0182623bca30a2a51b7b03ead6e04ce9ca7400d5b4e921c5b4276d&g=10eab6008d5642cf42abd2aa41f847cb&id=6a9a10dd92ce7c01836a5698&taste=1&supportDLTaste=0&mode=1&tr=manual&s=bc1b79eb7c886160b8dad34742bc6469"
+        try {
+            DynamicUrl.resolve(expired)
+            throw AssertionError("过期动态链接应当换址失败")
+        } catch (ex: Exception) {
+            check(ex.message!!.contains("动态链接无效")) { "报错信息不符: ${ex.message}" }
+            p("  ✓ 过期链接正确报错: ${ex.message?.take(60)}…")
+        }
     }
 
     // ---- 测试5: 真实 URL (可传入参数则执行) ----
