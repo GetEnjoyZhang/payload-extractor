@@ -11,9 +11,9 @@
 
 | 版本 | 目录 | 说明 |
 |---|---|---|
-| 📱 安卓 App | [`app/`](app/) | 已签名 APK 在 [Releases](https://github.com/GetEnjoyZhang/payload-extractor/releases/latest)，Android 8.0+ 直接安装 |
-| 🌐 网页版 | [`miniapp/web/`](miniapp/web/) | **GitHub Pages 在线使用**（见下），或本地 `node proxy.js` 起代理 |
-| 💬 微信小程序 | [`miniapp/`](miniapp/) | 自用版：开发者工具导入，需开启「不校验合法域名」（平台限制，无法正式上架任意 URL 工具） |
+| 📱 安卓 App | [`app/`](https://github.com/GetEnjoyZhang/payload-extractor/tree/main/app) | 已签名 APK 在 [Releases](https://github.com/GetEnjoyZhang/payload-extractor/releases/latest)，Android 8.0+ 直接安装 |
+| 🌐 网页版 | [`miniapp/web/`](https://github.com/GetEnjoyZhang/payload-extractor/tree/main/miniapp/web) | **GitHub Pages 在线使用**（见下），或本地 `node proxy.js` 起代理 |
+| 💬 微信小程序 | [`miniapp/`](https://github.com/GetEnjoyZhang/payload-extractor/tree/main/miniapp) | 自用版：开发者工具导入，需开启「不校验合法域名」（平台限制，无法正式上架任意 URL 工具） |
 
 ## 网页版在线使用
 
@@ -30,7 +30,7 @@
 - **v1.4.0（2026-10-17）**：修复「不支持的操作类型 14」——新版 HyperOS 2 OTA（红米 K50 至尊/PD2528 等）使用 ZSTD 压缩的 payload 数据块，安卓 App 现已支持在线提取（内置 zstd-jni 四 ABI 原生库）；新增右上角「设置」→「关于本项目」（含项目地址跳转）
 - **v1.4.1（2026-10-22）**：**支持 OPPO / 一加 ColorOS 16 动态下载链接**（`allawntech.com/downloadCheck` 等）——粘贴后自动换取真实 zip 直链再解析；链接若已过期（约 10~30 分钟时效）会给出明确提示
 - **网页版同步修复（2026-10-22）**：网页版/小程序核心集成 [fzstd](https://www.npmjs.com/package/fzstd)（纯 JS ZSTD 解压器，8KB），同样支持 ZSTD 数据块；合成 T6 用例覆盖，Pages 线上已更新（硬刷新 Ctrl+F5 生效）
-- **v1.3.1**：Android App（详见 [`app/`](app/)）：远程 zip + payload.bin 按需 Range 提取，液态玻璃 UI，小米大端头部 / 新版 manifest schema 兼容，搜索、行内进度、全部提取、任务取消
+- **v1.3.1**：Android App（详见 [`app/`](https://github.com/GetEnjoyZhang/payload-extractor/tree/main/app)）：远程 zip + payload.bin 按需 Range 提取，液态玻璃 UI，小米大端头部 / 新版 manifest schema 兼容，搜索、行内进度、全部提取、任务取消
 - **网页版 / 小程序**：与 App 核心逻辑一致，纯 JS 解压（pako / xz.js / bzip2 / brotli），仅支持 payload.bin 为 stored 存储的包
 
 ## 安卓 App 使用
@@ -42,5 +42,5 @@
 
 ## 网页版 / 小程序使用限制
 
-- 微信小程序因域名白名单限制**只能自用**（详见 [`miniapp/README.md`](miniapp/README.md)）
+- 微信小程序因域名白名单限制**只能自用**（详见 [`miniapp/README.md`](https://github.com/GetEnjoyZhang/payload-extractor/blob/main/miniapp/README.md)）
 - 网页版纯 JS 解压速度有限，大分区（system 等）耗时明显，建议只提取 boot / vbmeta / dtbo 等小镜像
